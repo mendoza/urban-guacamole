@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const chartType = [
   'Unknown',
   'Bar (Horizontal)',
@@ -19,6 +21,8 @@ const chartType = [
 ];
 
 const Home = () => {
+  const [panels, setPanels] = useState('');
+  const [containsChart, setContainsChart] = useState(false);
   return (
     <div className="flex w-full min-h-screen">
       <div className="flex xl:w-3/4 w-1/2 justify-center items-center">
@@ -36,6 +40,7 @@ const Home = () => {
             onSubmit={async (e) => {
               e.preventDefault();
               e.persist();
+              console.log('submitted :v');
             }}
           >
             <h3 className="text-xl font-bold text-center">
@@ -43,42 +48,91 @@ const Home = () => {
             </h3>
             <div className="mt-4" />
             <fieldset id="panels" className="flex justify-around">
-              <label htmlFor="panels">
-                <input type="radio" name="panels" value="single" /> Single Panel
+              <label htmlFor="single">
+                <input
+                  required
+                  type="radio"
+                  name="panels"
+                  id="single"
+                  onChange={() => {
+                    setPanels('single');
+                  }}
+                />
+                Single Panel
               </label>
-              <label htmlFor="choice">
-                <input type="radio" name="panels" value="multiple" /> Multiple
-                Panel
+              <label htmlFor="multiple">
+                <input
+                  type="radio"
+                  name="panels"
+                  id="multiple"
+                  onChange={() => {
+                    setPanels('multiple');
+                  }}
+                />
+                Multiple Panel
               </label>
             </fieldset>
+            <div hidden={panels === 'multiple' || panels === ''}>
+              <div className="mt-4" />
 
-            <div className="mt-4" />
+              <h3 className="text-xl font-bold text-center">
+                Does it contains at least one chart?
+              </h3>
+              <div className="mt-4" />
+              <fieldset id="contains-chart" className="flex justify-around">
+                <label htmlFor="chart">
+                  <input
+                    id="chart"
+                    type="radio"
+                    name="contains-chart"
+                    value="yes"
+                    required={panels === 'single'}
+                    onChange={() => {
+                      setContainsChart(true);
+                    }}
+                  />
+                  Yes
+                </label>
+                <label htmlFor="no-chart">
+                  <input
+                    id="no-chart"
+                    type="radio"
+                    name="contains-chart"
+                    value="no"
+                    onChange={() => {
+                      setContainsChart(false);
+                    }}
+                  />
+                  No
+                </label>
+              </fieldset>
 
-            <h3 className="text-xl font-bold text-center">
-              Does it contains at least one chart?
-            </h3>
-            <div className="mt-4" />
-            <fieldset id="chart" className="flex justify-around">
-              <label htmlFor="chart">
-                <input type="radio" name="chart" value="yes" /> Yes
-              </label>
-              <label htmlFor="chart">
-                <input type="radio" name="chart" value="no" /> No
-              </label>
-            </fieldset>
+              <div hidden={!containsChart}>
+                <div className="mt-4" />
 
-            <div className="mt-4" />
-
-            <h3 className="text-xl font-bold text-center">
-              What type of chart is it?
-            </h3>
-            <div className="mt-4" />
-            <div className="flex justify-around">
-              <select>
-                {chartType.map((item, index) => {
-                  return <option value={index - 1}>{item}</option>;
-                })}
-              </select>
+                <h3 className="text-xl font-bold text-center">
+                  What type of chart is it?
+                </h3>
+                <div className="mt-4" />
+                <div className="flex justify-around">
+                  <select
+                    required={panels === 'single' && containsChart}
+                    defaultValue=""
+                  >
+                    <option disabled selected value="">
+                      Select a type of chart
+                    </option>
+                    {chartType.map((item, index) => {
+                      return (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <option key={`chartype-${index}`} value={index - 1}>
+                          {item}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              </div>
             </div>
             <div className="flex items-baseline justify-around">
               <button
