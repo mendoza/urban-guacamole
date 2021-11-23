@@ -1,14 +1,14 @@
-const express = require('express');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const user = require('../models/user.model');
-const middlewares = require('../middlewares');
+const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const user = require("../models/user.model");
+const middlewares = require("../middlewares");
 
 const saltRounds = Number(process.env.SALT_ROUNDS);
 const secret = process.env.SECRET;
 const router = express.Router();
 
-router.post('/signup', (req, res, next) => {
+router.post("/signup", (req, res, next) => {
   const { email, password, name } = req.body;
   const hash = bcrypt.hashSync(password, saltRounds);
   user
@@ -21,16 +21,17 @@ router.post('/signup', (req, res, next) => {
     });
 });
 
-router.post('/login', (req, res, next) => {
+router.post("/login", (req, res, next) => {
   const { email, password } = req.body;
   user.findOne({ email }).then((doc) => {
     if (bcrypt.compareSync(password, doc.password)) {
-      jwt.sign({ email }, secret, (err, hash) => {
+      jwt.sign({ email, role: doc.role }, secret, (err, hash) => {
         if (err) next(err);
         res.json({
           success: true,
           name: doc.name,
           token: hash,
+          role: doc.role,
         });
       });
     } else {

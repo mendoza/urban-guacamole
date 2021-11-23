@@ -29,8 +29,8 @@ mongoose.connect(
 );
 
 app.use(cors());
-app.use(body.urlencoded({ extended: true }));
-app.use(body.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "50mb" }));
 app.use(helmet());
 
 const accessLogStream = rfs.createStream("access.log", {
@@ -49,6 +49,7 @@ if (process.env.ENV === "production") {
 }
 
 app.use("/auth", require("./routers/auth.router"));
+app.use("/annotation", require("./routers/annotation.router"));
 
 app.use("/img", express.static("./images"));
 app.use(middlewares.defaultError);

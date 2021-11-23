@@ -26,6 +26,7 @@ const Login = () => {
                 password,
               });
               window.electron.store.set('token', data.token);
+              window.electron.store.set('role', data.role);
               history.push('/');
               if (showError) {
                 setShowError(false);

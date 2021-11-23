@@ -1,36 +1,46 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route, RouteComponentProps } from 'react-router-dom';
+import jwt_decode from 'jwt-decode';
 
 type PropTypes = {
-  children: React.ReactFragment;
+  component:
+    | React.ComponentType<RouteComponentProps<any>>
+    | React.ComponentType<unknown>;
   path: string;
+  roles?: Array<string>;
   exact?: boolean;
 };
 
-const PrivateRoute = ({ children, ...rest }: PropTypes) => {
-  const token = window.electron.store.get('token');
+const PrivateRoute = ({ component: Component, roles, ...rest }: PropTypes) => {
   return (
     <Route
       {...rest}
-      render={({ location }) =>
-        token ? (
-          children
-        ) : (
-          <Redirect
-            to={{
-              pathname: '/login',
-              state: { from: location },
-            }}
-          />
-        )
-      }
+      render={(props) => {
+        const token = window.electron.store.get('token') || '';
+        if (!token) {
+          return (
+            <Redirect
+              // eslint-disable-next-line react/prop-types
+              to={{ pathname: '/login', state: { from: props.location } }}
+            />
+          );
+        }
+
+        const { role } = jwt_decode(token) as any;
+        if (role && !roles?.includes(role)) {
+          return <Redirect to="/" />;
+        }
+        // authorised so return component
+        return <Component {...props} />;
+      }}
     />
   );
 };
 
 PrivateRoute.defaultProps = {
   exact: false,
+  roles: [],
 };
 
 export default PrivateRoute;
