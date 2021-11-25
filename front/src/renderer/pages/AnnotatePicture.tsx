@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import NavBar from '../components/NavBar';
 import api from '../utils/api';
 
@@ -25,8 +25,23 @@ const chartType = [
 const Annotate = () => {
   const [panels, setPanels] = useState('');
   const [containsChart, setContainsChart] = useState(false);
-  const [typeOfChart, setTypeOfChart] = useState(0);
+  const [typeOfChart, setTypeOfChart] = useState('');
   const [path] = useState('PMC1618809/PMC1618809___1.jpg');
+  useEffect(() => {
+    const asyncGet = async () => {
+      const { data } = await api.get('annotation/', {
+        params: { path },
+        headers: {
+          authorization: window.electron.store.get('token'),
+        },
+      });
+      const { item } = data;
+      if (item.prePanels) setPanels(item.prePanels);
+      if (item.preContainsChart) setContainsChart(item.preContainsChart);
+      if (item.preTypeOfChart) setTypeOfChart(item.preTypeOfChart);
+    };
+    asyncGet();
+  }, [path]);
   return (
     <>
       <NavBar />
@@ -52,7 +67,7 @@ const Annotate = () => {
                     {
                       panels,
                       containsChart,
-                      chartType: chartType[typeOfChart + 1],
+                      chartType: typeOfChart,
                       path,
                     },
                     {
@@ -79,6 +94,7 @@ const Annotate = () => {
                     type="radio"
                     name="panels"
                     id="single"
+                    checked={panels === 'single'}
                     onChange={() => {
                       setPanels('single');
                     }}
@@ -90,6 +106,7 @@ const Annotate = () => {
                     type="radio"
                     name="panels"
                     id="multiple"
+                    checked={panels === 'multiple'}
                     onChange={() => {
                       setPanels('multiple');
                     }}
@@ -112,6 +129,7 @@ const Annotate = () => {
                       name="contains-chart"
                       value="yes"
                       required={panels === 'single'}
+                      checked={containsChart}
                       onChange={() => {
                         setContainsChart(true);
                       }}
@@ -124,6 +142,7 @@ const Annotate = () => {
                       type="radio"
                       name="contains-chart"
                       value="no"
+                      checked={!containsChart}
                       onChange={() => {
                         setContainsChart(false);
                       }}
@@ -142,8 +161,9 @@ const Annotate = () => {
                   <div className="flex justify-around">
                     <select
                       required={panels === 'single' && containsChart}
+                      value={typeOfChart}
                       onChange={(e) => {
-                        setTypeOfChart(parseInt(e.target.value, 10));
+                        setTypeOfChart(e.target.value);
                       }}
                       defaultValue={-2}
                     >
@@ -153,7 +173,7 @@ const Annotate = () => {
                       {chartType.map((item, index) => {
                         return (
                           // eslint-disable-next-line react/no-array-index-key
-                          <option key={`chartype-${index}`} value={index - 1}>
+                          <option key={`chartype-${index}`} value={item}>
                             {item}
                           </option>
                         );

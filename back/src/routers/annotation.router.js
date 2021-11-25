@@ -5,13 +5,38 @@ const AnnotationRepo = require("../models/annotation.model");
 const router = express.Router();
 
 router.use(middlewares.checkJWT);
-router.post("/annotate", async (req, res, next) => {
-  const { user, body } = req;
-  console.log(user, body);
-  const item = await AnnotationRepo.findOne({ path: body.path });
-  console.log(item);
+router.get("/", async (req, res, next) => {
+  const { query } = req;
+  const { path } = query;
+  try {
+    const found = await AnnotationRepo.findOne({ path });
+    res.send({ item: found });
+  } catch (error) {
+    next(error);
+  }
+});
 
-  res.send({ salio: "tuanis" });
+router.post("/annotate", async (req, res, next) => {
+  const { body } = req;
+  try {
+    const item = await AnnotationRepo.findOne({ path: body.path });
+    if (item) {
+      const update = {
+        panels: body.panels,
+        containsChart: body.containsChart,
+        typeOfChart: body.chartType,
+      };
+      const confirm = await AnnotationRepo.updateOne(
+        { path: body.path },
+        { $set: { ...update } }
+      );
+      res.send(confirm);
+    } else {
+      res.status(400).send({ message: "Path not found" });
+    }
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.post("/preclass", async (req, res, next) => {
@@ -19,26 +44,57 @@ router.post("/preclass", async (req, res, next) => {
 
   if (["admin", "verifier"].includes(user.role)) {
     const { data } = req.body;
-    const paths = Object.keys(data).filter((key) => !data[key]["error"]);
+    let paths = Object.keys(data).filter((key) => !data[key]["error"]);
     try {
       let found = await AnnotationRepo.find({ path: { $in: paths } });
       found = found.map((object) => object.path);
+      paths = paths.filter((path) => !found.includes(path));
+      console.log("found: %d", found.length);
+      const toUpdate = found;
       // create new annotations
-      const objects = paths
-        .filter((path) => !found.includes(path))
-        .map((key) => {
-          const classfied = data[key];
-          const created = {
-            path: key,
-            prePanels: classfied.multi_panel ? "multiple" : "single",
-            preContainsChart: classfied.has_charts,
-            preTypeOfChart: classfied.chart_class,
-          };
-          return created;
-        });
-      await AnnotationRepo.collection.insertMany(objects);
+      const objects = paths.map((key) => {
+        const classified = data[key];
+        const created = {
+          path: key,
+          prePanels: classified.multi_panel ? "multiple" : "single",
+          preContainsChart: classified.has_charts,
+          preTypeOfChart: classified.chart_class,
+          confidence: classified.hl_confidence,
+          chartConfidence: classified.chart_confidence,
+        };
+        return created;
+      });
+      console.log("creating: %d", objects.length);
+      if (objects.length > 0)
+        await AnnotationRepo.collection.insertMany(objects);
+
+      // update on bulk
+      const updates = toUpdate.map((key) => {
+        const classified = data[key];
+        const created = {
+          updateOne: {
+            filter: { path: key },
+            update: {
+              $set: {
+                path: key,
+                prePanels: classified.multi_panel ? "multiple" : "single",
+                preContainsChart: classified.has_charts,
+                preTypeOfChart: classified.chart_class,
+                confidence: classified.hl_confidence,
+                chartConfidence: classified.chart_confidence,
+              },
+            },
+          },
+        };
+        return created;
+      });
+      console.log("updating: %d", updates.length);
+      if (updates.length > 0)
+        await AnnotationRepo.collection.bulkWrite(updates);
+
       res.send({ data: "pong" });
     } catch (error) {
+      console.log(error.stack);
       next(error);
     }
   } else {

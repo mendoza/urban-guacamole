@@ -48,6 +48,14 @@ const annotationSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       required: false,
     },
+    confidence: {
+      type: Number,
+      required: false,
+    },
+    chartConfidence: {
+      type: Number,
+      required: false,
+    },
     prePanels: {
       type: String,
       enum: ["single", "multiple"],
