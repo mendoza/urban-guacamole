@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Redirect } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import api from '../utils/api';
-import Alert from '../components/Alert';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [showError, setShowError] = useState(false);
   const history = useHistory();
+
+  if (window.electron.store.get('role'))
+    return <Redirect to={`/${window.electron.store.get('role')}`} />;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -27,14 +28,10 @@ const Login = () => {
               });
               window.electron.store.set('token', data.token);
               window.electron.store.set('role', data.role);
-              history.push('/');
-              if (showError) {
-                setShowError(false);
-                setError('');
-              }
+              console.log(data.role);
+              history.push(`/${data.role}`);
             } catch ({ response }) {
-              setError('Error on authentication');
-              setShowError(true);
+              toast.error('Error on authentication');
             }
             // eslint-disable-next-line promise/always-return
           }}
@@ -70,7 +67,6 @@ const Login = () => {
                 />
               </label>
             </div>
-            <Alert text={error} visible={showError} />
             <div className="flex items-baseline justify-around">
               <button
                 type="submit"

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useHistory } from 'react-router';
+import { toast } from 'react-toastify';
 
 const NavBar = () => {
   const [hidden, setHidden] = useState(true);
@@ -37,7 +38,8 @@ const NavBar = () => {
                 onClick={() => {
                   window.electron.store.delete('token');
                   window.electron.store.delete('role');
-                  history.push('/login');
+                  toast.success('Logged out successfully');
+                  history.push('/');
                 }}
                 className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
                 href="#pablo"

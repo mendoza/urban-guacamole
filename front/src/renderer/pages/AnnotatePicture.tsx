@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+
 import NavBar from '../components/NavBar';
 import api from '../utils/api';
 
@@ -26,7 +28,7 @@ const Annotate = () => {
   const [panels, setPanels] = useState('');
   const [containsChart, setContainsChart] = useState(false);
   const [typeOfChart, setTypeOfChart] = useState('');
-  const [path] = useState('PMC1618809/PMC1618809___1.jpg');
+  const [path] = useState('PMC2374900/PMC2374900___g001.jpg');
   useEffect(() => {
     const asyncGet = async () => {
       const { data } = await api.get('annotation/', {
@@ -62,7 +64,7 @@ const Annotate = () => {
                 e.preventDefault();
                 e.persist();
                 try {
-                  const { data } = await api.post(
+                  await api.post(
                     '/annotation/annotate',
                     {
                       panels,
@@ -76,11 +78,10 @@ const Annotate = () => {
                       },
                     }
                   );
-                  console.log(data);
+                  toast.success('Annotated Successfully!');
                 } catch (error) {
                   console.log(error);
                 }
-                console.log('submitted :v');
               }}
             >
               <h3 className="text-xl font-bold text-center">
@@ -165,7 +166,6 @@ const Annotate = () => {
                       onChange={(e) => {
                         setTypeOfChart(e.target.value);
                       }}
-                      defaultValue={-2}
                     >
                       <option disabled value={-2}>
                         Select a type of chart

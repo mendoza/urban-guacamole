@@ -22,14 +22,14 @@ const PrivateRoute = ({ component: Component, roles, ...rest }: PropTypes) => {
           return (
             <Redirect
               // eslint-disable-next-line react/prop-types
-              to={{ pathname: '/login', state: { from: props.location } }}
+              to={{ pathname: '/', state: { from: props.location } }}
             />
           );
         }
 
         const { role } = jwt_decode(token) as any;
         if (role && !roles?.includes(role)) {
-          return <Redirect to="/" />;
+          return <Redirect to={`/${role}`} />;
         }
         // authorised so return component
         return <Component {...props} />;

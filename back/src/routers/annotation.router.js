@@ -18,6 +18,7 @@ router.get("/", async (req, res, next) => {
 
 router.post("/annotate", async (req, res, next) => {
   const { body } = req;
+  const { _id } = req.user;
   try {
     const item = await AnnotationRepo.findOne({ path: body.path });
     if (item) {
@@ -25,6 +26,7 @@ router.post("/annotate", async (req, res, next) => {
         panels: body.panels,
         containsChart: body.containsChart,
         typeOfChart: body.chartType,
+        annotatedBy: _id,
       };
       const confirm = await AnnotationRepo.updateOne(
         { path: body.path },
@@ -39,9 +41,46 @@ router.post("/annotate", async (req, res, next) => {
   }
 });
 
+router.get("/verify", async (req, res, next) => {
+  try {
+    const found = await AnnotationRepo.find({
+      annotatedBy: { $exists: true },
+      verifiedBy: { $exists: false },
+    });
+    res.send({ found });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/verify", async (req, res, next) => {
+  const { correct, wrong } = req.body;
+  const { _id } = req.user;
+  try {
+    let confirm;
+    if (correct) {
+      confirm = await AnnotationRepo.updateMany(
+        { path: { $in: correct } },
+        { verifiedBy: _id }
+      );
+    }
+
+    if (wrong) {
+      confirm = await AnnotationRepo.updateMany(
+        { path: { $in: wrong } },
+        { $unset: { annotatedBy: 1 } }
+      );
+    }
+    res.send({ data: "pong" });
+  } catch (error) {
+    console.log(error.stack);
+
+    next(error);
+  }
+});
+
 router.post("/preclass", async (req, res, next) => {
   const { user } = req;
-
   if (["admin", "verifier"].includes(user.role)) {
     const { data } = req.body;
     let paths = Object.keys(data).filter((key) => !data[key]["error"]);
@@ -94,7 +133,6 @@ router.post("/preclass", async (req, res, next) => {
 
       res.send({ data: "pong" });
     } catch (error) {
-      console.log(error.stack);
       next(error);
     }
   } else {

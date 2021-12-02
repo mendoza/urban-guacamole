@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import NavBar from '../components/NavBar';
 import api from '../utils/api';
 
@@ -25,7 +26,7 @@ const LoadPreclass = () => {
               />
             </div>
           ) : (
-            <div className="bg-white shadow-lg rounded-kg m-2 overflow-auto h-full w-1/2">
+            <div className="bg-white shadow-lg rounded-lg m-2 overflow-auto h-full w-1/2">
               <pre>{JSON.stringify(preClass, null, 4)}</pre>
             </div>
           )}
@@ -69,7 +70,7 @@ const LoadPreclass = () => {
                     e.persist();
                     setIsLoadingUpload(true);
                     try {
-                      const { data } = await api.post(
+                      await api.post(
                         '/annotation/preclass',
                         {
                           data: preClass,
@@ -80,9 +81,11 @@ const LoadPreclass = () => {
                           },
                         }
                       );
-                      console.log(data);
+                      toast.success('Created/Updated preclassification');
                     } catch (error) {
-                      console.log(error);
+                      toast.error(
+                        'Error on creating/updating preclassification'
+                      );
                     } finally {
                       setIsLoadingUpload(false);
                     }
