@@ -51,9 +51,10 @@ const Annotate = () => {
         <div className="flex w-1/2 justify-center items-center mx-8">
           <div className="flex justify-center items-center py-4 px-8 bg-white shadow-lg rounded-lg my-20 xl:h-5/6 w-full">
             <img
+              loading="lazy"
               className="object-contain h-auto xl:w-5/6 w-full"
-              src={`http://localhost:3001/img/${path}`}
-              alt="test chart"
+              src={`${process.env.API_URL}img/${path}`}
+              alt={path}
             />
           </div>
         </div>

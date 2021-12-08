@@ -1,50 +1,190 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/no-array-index-key */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   FaCheck,
   FaMinus,
   FaTimes,
   FaSync,
   FaCheckDouble,
+  FaChevronLeft,
+  FaChevronRight,
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import NavBar from '../components/NavBar';
 import api from '../utils/api';
 
+const chartType = [
+  'Unknown',
+  'Bar (Horizontal)',
+  'Bar (Vertical)',
+  'Box (Horizontal)',
+  'Box (Vertical)',
+  'Pie',
+  'Line',
+  'Scatter',
+  'Scatter With Line',
+  'Area',
+  'Heatmap',
+  'Interval (Horizontal)',
+  'Interval (Vertical)',
+  'Manhattan',
+  'Map',
+  'Surface',
+  'Venn',
+];
+const pageSize = 8;
+
 const Verify = () => {
   const [toVerify, setToVerify] = useState<Array<any>>([]);
-  const asyncGet = async () => {
+  const [filteredToVerify, setFilteredToVerify] = useState<Array<any>>([]);
+  const [panels, setPanels] = useState('all');
+  const [contains, setContains] = useState('all');
+  const [type, setType] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const setSellectedToall = useCallback(
+    (value) => {
+      setFilteredToVerify(
+        filteredToVerify.map((item) => ({ ...item, selected: value }))
+      );
+    },
+    [filteredToVerify]
+  );
+  const asyncGet = useCallback(async () => {
     try {
       const { data } = await api.get('/annotation/verify', {
         headers: {
           authorization: window.electron.store.get('token'),
         },
       });
-      setToVerify(
-        data.found.map((item: any) => ({ ...item, selected: false }))
-      );
+      setToVerify([
+        ...data.found.map((item: any) => ({ ...item, selected: false })),
+        ...data.found.map((item: any) => ({ ...item, selected: false })),
+        ...data.found.map((item: any) => ({ ...item, selected: false })),
+        ...data.found.map((item: any) => ({ ...item, selected: false })),
+        ...data.found.map((item: any) => ({ ...item, selected: false })),
+        ...data.found.map((item: any) => ({ ...item, selected: false })),
+      ]);
+
       toast.success('Successfully got images to verify');
     } catch (error) {
       toast.error('Error getting images to verify');
     }
-  };
+  }, []);
 
   useEffect(() => {
     asyncGet();
-  }, []);
+  }, [asyncGet]);
+
+  useEffect(() => {
+    const filtered = toVerify
+      .filter((item) => panels === 'all' || item.panels === panels)
+      .filter(
+        (item) =>
+          contains === 'all' || item.containsChart === (contains === 'yes')
+      )
+      .filter((item) => type === 'all' || item.typeOfChart === type);
+    setLastPage(Math.ceil(filtered.length / pageSize));
+    setFilteredToVerify(
+      filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    );
+  }, [toVerify, panels, contains, type, currentPage]);
 
   return (
     <>
       <NavBar />
-      <div className="flex w-full h-full">
+      <div className="flex w-full h-full flex-col">
         <div
           style={{ height: '80vh' }}
           className="flex w-full justify-center items-center"
         >
           <div className="bg-white shadow-lg rounded-lg my-2 mx-8 p-4 overflow-auto h-full w-3/4">
+            <div className="flex flex-row justify-between p-4 w-full mb-4 bg-white rounded-lg shadow-lg sticky top-4">
+              <div className="flex flex-row w-full justify-around">
+                <label htmlFor="image-type" className="block text-left">
+                  <span className="text-gray-700">Type of Image?</span>
+                  <select
+                    id="image-type"
+                    className="form-select block w-full mt-1"
+                    value={panels}
+                    onChange={(e) => {
+                      setPanels(e.target.value);
+                    }}
+                  >
+                    <option value="all">All</option>
+                    <option value="single">Single</option>
+                    <option value="multiple">Multiple</option>
+                  </select>
+                </label>
+                <label htmlFor="contains-chart" className="block text-left">
+                  <span className="text-gray-700">Contains Chart?</span>
+                  <select
+                    id="contains-chart"
+                    className="form-select block w-full mt-1"
+                    value={contains}
+                    onChange={(e) => {
+                      setContains(e.target.value);
+                    }}
+                  >
+                    <option value="all">All</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </label>
+                <label htmlFor="chart-type" className="block text-left">
+                  <span className="text-gray-700">Chart Type?</span>
+                  <select
+                    id="chart-type"
+                    className="form-select block w-full mt-1"
+                    value={type}
+                    onChange={(e) => {
+                      setType(e.target.value);
+                    }}
+                  >
+                    <option value="all">All</option>
+                    {chartType.map((item, index) => {
+                      return (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <option key={`chartype-${index}`} value={item}>
+                          {item}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </label>
+                <div className="flex items-center justify-center mb-4">
+                  <button
+                    className="text-blue-500 bg-transparent border-l border-t border-b border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded-l outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                    disabled={currentPage === 1}
+                    onClick={() => {
+                      if (currentPage !== 1) setCurrentPage(currentPage - 1);
+                    }}
+                  >
+                    <FaChevronLeft />
+                  </button>
+                  <button
+                    className="text-blue-500 bg-transparent border border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                  >
+                    {currentPage}
+                  </button>
+                  <button
+                    className="text-blue-500 bg-transparent border-r border-t border-b border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded-r outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                    disabled={currentPage === lastPage}
+                    onClick={() => {
+                      setCurrentPage(currentPage + 1);
+                    }}
+                  >
+                    <FaChevronRight />
+                  </button>
+                </div>
+              </div>
+            </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {toVerify.map((item, idx) => {
+              {filteredToVerify.map((item, idx) => {
                 return (
                   <div
                     key={`to-verify-${idx}`}
@@ -52,8 +192,8 @@ const Verify = () => {
                     role="button"
                     onKeyDown={(e) => {
                       if (['Enter', ' '].includes(e.key))
-                        setToVerify(
-                          toVerify.map((itemInner, index) => {
+                        setFilteredToVerify(
+                          filteredToVerify.map((itemInner, index) => {
                             if (index !== idx) return itemInner;
                             return {
                               ...itemInner,
@@ -63,8 +203,8 @@ const Verify = () => {
                         );
                     }}
                     onClick={() => {
-                      setToVerify(
-                        toVerify.map((itemInner, index) => {
+                      setFilteredToVerify(
+                        filteredToVerify.map((itemInner, index) => {
                           if (index !== idx) return itemInner;
                           return {
                             ...itemInner,
@@ -80,7 +220,7 @@ const Verify = () => {
                     <img
                       alt={item.path}
                       className="object-contain h-auto xl:w-5/6 w-full"
-                      src={`http://localhost:3001/img/${item.path}`}
+                      src={`${process.env.API_URL}img/${item.path}`}
                     />
                     <div className="flex flex-col capitalize mt-2">
                       <p>
@@ -107,7 +247,6 @@ const Verify = () => {
             <h3 className="text-2xl font-normal leading-normal mt-0 mb-2">
               Actions
             </h3>
-
             <button
               type="button"
               onClick={async () => {
@@ -115,7 +254,7 @@ const Verify = () => {
                   await api.post(
                     '/annotation/verify',
                     {
-                      correct: toVerify
+                      correct: filteredToVerify
                         .filter((item) => item.selected)
                         .map((item) => item.path),
                     },
@@ -142,7 +281,7 @@ const Verify = () => {
                   await api.post(
                     '/annotation/verify',
                     {
-                      wrong: toVerify
+                      wrong: filteredToVerify
                         .filter((item) => !item.selected)
                         .map((item) => item.path),
                     },
@@ -174,9 +313,7 @@ const Verify = () => {
             <button
               type="button"
               onClick={() => {
-                setToVerify(
-                  toVerify.map((item) => ({ ...item, selected: true }))
-                );
+                setSellectedToall(true);
               }}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex justify-center items-center"
             >
@@ -185,9 +322,7 @@ const Verify = () => {
             <button
               type="button"
               onClick={() => {
-                setToVerify(
-                  toVerify.map((item) => ({ ...item, selected: false }))
-                );
+                setSellectedToall(false);
               }}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex justify-center items-center"
             >
