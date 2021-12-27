@@ -37,4 +37,26 @@ const checkJWT = (req, res, next) => {
     res.sendStatus(401);
   }
 };
-module.exports = { defaultError, NotFound, checkJWT };
+
+const checkAdminJWT = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const token = authHeader;
+    // eslint-disable-next-line consistent-return
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.sendStatus(403);
+      }
+      user.findOne({ email: decoded.email, role: "admin" }).then((userDoc) => {
+        if (userDoc) {
+          req.user = userDoc;
+          next();
+        }
+      });
+    });
+  } else {
+    res.sendStatus(401);
+  }
+};
+module.exports = { defaultError, NotFound, checkJWT, checkAdminJWT };

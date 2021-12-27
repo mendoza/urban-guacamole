@@ -8,36 +8,33 @@ const saltRounds = Number(process.env.SALT_ROUNDS);
 const secret = process.env.SECRET;
 const router = express.Router();
 
-router.post("/signup", (req, res, next) => {
+router.post("/signup", async (req, res, next) => {
   const { email, password, name } = req.body;
   const hash = bcrypt.hashSync(password, saltRounds);
-  user
-    .create({ email, password: hash, name })
-    .then((doc) => {
-      res.json({ success: true, user: doc.toJSON() });
-    })
-    .catch((err) => {
-      next(err);
-    });
+  try {
+    const doc = await user.create({ email, password: hash, name });
+    res.json({ success: true, user: doc.toJSON() });
+  } catch (error) {
+    next(err);
+  }
 });
 
-router.post("/login", (req, res, next) => {
+router.post("/login", async (req, res, next) => {
   const { email, password } = req.body;
-  user.findOne({ email }).then((doc) => {
-    if (bcrypt.compareSync(password, doc.password)) {
-      jwt.sign({ email, role: doc.role }, secret, (err, hash) => {
-        if (err) next(err);
-        res.json({
-          success: true,
-          name: doc.name,
-          token: hash,
-          role: doc.role,
-        });
+  const doc = await user.findOne({ email });
+  if (bcrypt.compareSync(password, doc.password)) {
+    jwt.sign({ email, role: doc.role }, secret, (err, hash) => {
+      if (err) next(err);
+      res.json({
+        success: true,
+        name: doc.name,
+        token: hash,
+        role: doc.role,
       });
-    } else {
-      res.status(401).json({ success: false });
-    }
-  });
+    });
+  } else {
+    res.status(401).json({ success: false });
+  }
 });
 
 router.use(middlewares.defaultError);

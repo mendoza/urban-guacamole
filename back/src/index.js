@@ -7,7 +7,6 @@ const helmet = require("helmet");
 const cors = require("cors");
 const body = require("body-parser");
 const path = require("path");
-const fs = require("fs");
 const middlewares = require("./middlewares");
 
 const app = express();
@@ -50,6 +49,7 @@ if (process.env.ENV === "production") {
 
 app.use("/auth", require("./routers/auth.router"));
 app.use("/annotation", require("./routers/annotation.router"));
+app.use("/admin", require("./routers/admin.router"));
 
 app.use("/img", express.static("./images"));
 app.use(middlewares.defaultError);

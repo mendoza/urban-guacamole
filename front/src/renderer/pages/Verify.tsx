@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable react/no-array-index-key */
 import { useCallback, useEffect, useState } from 'react';
 import {
   FaCheck,
@@ -59,11 +57,6 @@ const Verify = () => {
         },
       });
       setToVerify([
-        ...data.found.map((item: any) => ({ ...item, selected: false })),
-        ...data.found.map((item: any) => ({ ...item, selected: false })),
-        ...data.found.map((item: any) => ({ ...item, selected: false })),
-        ...data.found.map((item: any) => ({ ...item, selected: false })),
-        ...data.found.map((item: any) => ({ ...item, selected: false })),
         ...data.found.map((item: any) => ({ ...item, selected: false })),
       ]);
 
