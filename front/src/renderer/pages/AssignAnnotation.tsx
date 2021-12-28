@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import NavBar from '../components/NavBar';
 import api from '../utils/api';
 
@@ -9,12 +10,16 @@ const AssignAnnotation = () => {
   const [difficulty, setDifficulty] = useState('easy');
   useEffect(() => {
     const asyncGet = async () => {
-      const { data } = await api.get('admin/users', {
-        headers: {
-          authorization: window.electron.store.get('token'),
-        },
-      });
-      setAnnotators(data.users);
+      try {
+        const { data } = await api.get('admin/users', {
+          headers: {
+            authorization: window.electron.store.get('token'),
+          },
+        });
+        setAnnotators(data.users);
+      } catch (error) {
+        toast.error('Error getting annotators!');
+      }
     };
     asyncGet();
   }, []);
@@ -35,6 +40,24 @@ const AssignAnnotation = () => {
               onSubmit={async (e) => {
                 e.preventDefault();
                 e.persist();
+                try {
+                  await api.post(
+                    'admin/assign',
+                    {
+                      limit: amount,
+                      who: selectedAnnotator,
+                      difficulty,
+                    },
+                    {
+                      headers: {
+                        authorization: window.electron.store.get('token'),
+                      },
+                    }
+                  );
+                  toast.success('Assigned successfully to the annotator!');
+                } catch (error) {
+                  toast.error('Error assigning to the annotator!');
+                }
               }}
             >
               <div className="">
