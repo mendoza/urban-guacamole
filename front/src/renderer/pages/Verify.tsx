@@ -164,6 +164,20 @@ const Verify = () => {
                     {currentPage}
                   </button>
                   <button
+                    disabled
+                    className="text-blue-500 bg-transparent border border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                  >
+                    ...
+                  </button>
+                  <button
+                    disabled
+                    className="text-blue-500 bg-transparent border border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                  >
+                    {`${lastPage}`}
+                  </button>
+                  <button
                     className="text-blue-500 bg-transparent border-r border-t border-b border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded-r outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
                     type="button"
                     disabled={currentPage === lastPage}

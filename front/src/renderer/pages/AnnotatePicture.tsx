@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
 import NavBar from '../components/NavBar';
@@ -23,38 +24,95 @@ const chartType = [
   'Surface',
   'Venn',
 ];
+const pageSize = 1;
 
 const Annotate = () => {
   const [panels, setPanels] = useState('');
   const [containsChart, setContainsChart] = useState(false);
   const [typeOfChart, setTypeOfChart] = useState('');
-  const [path] = useState('PMC2374900/PMC2374900___g001.jpg');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentImage, setCurrentImage] = useState<any>({});
+  const [lastPage, setLastPage] = useState(1);
+  const [images, setImages] = useState([]);
   useEffect(() => {
     const asyncGet = async () => {
       const { data } = await api.get('annotation/', {
-        params: { path },
         headers: {
           authorization: window.electron.store.get('token'),
         },
       });
-      const { item } = data;
+      const { items } = data;
+      const item = items[0] || {};
+      setCurrentImage(item);
       if (item.prePanels) setPanels(item.prePanels);
       if (item.preContainsChart) setContainsChart(item.preContainsChart);
       if (item.preTypeOfChart) setTypeOfChart(item.preTypeOfChart);
+      setImages(items);
+      setLastPage(Math.ceil(images.length / pageSize));
     };
     asyncGet();
-  }, [path]);
+  }, [images.length]);
+
+  useEffect(() => {
+    console.log(currentImage);
+  }, [currentImage]);
+
   return (
     <>
       <NavBar />
+      <div className="py-4 px-8 mx-4 bg-white shadow-lg rounded-lg">
+        <div className="flex flex-row items-center">
+          <button
+            className="text-blue-500 bg-transparent border-l border-t border-b border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded-l outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
+            type="button"
+            disabled={currentPage === 1}
+            onClick={() => {
+              if (currentPage !== 1) setCurrentPage(currentPage - 1);
+            }}
+          >
+            <FaChevronLeft />
+          </button>
+          <button
+            disabled
+            className="text-blue-500 bg-transparent border border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
+            type="button"
+          >
+            {`${currentPage}`}
+          </button>
+          <button
+            disabled
+            className="text-blue-500 bg-transparent border border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
+            type="button"
+          >
+            ...
+          </button>
+          <button
+            disabled
+            className="text-blue-500 bg-transparent border border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
+            type="button"
+          >
+            {`${lastPage}`}
+          </button>
+          <button
+            className="text-blue-500 bg-transparent border-r border-t border-b border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded-r outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
+            type="button"
+            disabled={currentPage === lastPage}
+            onClick={() => {
+              setCurrentPage(currentPage + 1);
+            }}
+          >
+            <FaChevronRight />
+          </button>
+        </div>
+      </div>
       <div className="flex w-full h-full">
         <div className="flex w-1/2 justify-center items-center mx-8">
           <div className="flex justify-center items-center py-4 px-8 bg-white shadow-lg rounded-lg my-20 xl:h-5/6 w-full">
             <img
               loading="lazy"
               className="object-contain h-auto xl:w-5/6 w-full"
-              src={`${process.env.API_URL}img/${path}`}
-              alt={path}
+              src={`${process.env.API_URL}img/${currentImage.path}`}
+              alt={currentImage.path}
             />
           </div>
         </div>
@@ -71,7 +129,7 @@ const Annotate = () => {
                       panels,
                       containsChart,
                       chartType: typeOfChart,
-                      path,
+                      path: currentImage.path,
                     },
                     {
                       headers: {

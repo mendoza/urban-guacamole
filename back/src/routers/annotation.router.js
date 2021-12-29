@@ -1,17 +1,43 @@
 const express = require("express");
 const middlewares = require("../middlewares");
 const AnnotationRepo = require("../models/annotation.model");
+const AnnotationMetaRepo = require("../models/annotationMeta.model");
 
 const router = express.Router();
 
 router.use(middlewares.checkJWT);
 router.get("/", async (req, res, next) => {
-  const { query } = req;
-  const { path } = query;
+  const { user } = req;
   try {
-    const found = await AnnotationRepo.findOne({ path });
-    res.send({ item: found });
+    const found = await AnnotationMetaRepo.aggregate([
+      {
+        $match: {
+          done: { $eq: false },
+          annotatedBy: { $eq: user._id },
+        },
+      },
+      {
+        $lookup: {
+          from: "annotations",
+          localField: "annotationId",
+          foreignField: "_id",
+          as: "annotation",
+        },
+      },
+      {
+        $set: {
+          annotation: { $first: "$annotation" },
+        },
+      },
+    ]);
+    console.log(found[0]);
+    // const found = await AnnotationMetaRepo.find({
+    //   annotatedBy: user._id,
+    //   done: false,
+    // });
+    res.send({ items: found, item: found[0] });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 });
