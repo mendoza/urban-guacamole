@@ -6,7 +6,7 @@ import webpack from 'webpack';
 import webpackPaths from './webpack.paths';
 import { dependencies as externals } from '../../release/app/package.json';
 
-export default {
+const configuration: webpack.Configuration = {
   externals: [...Object.keys(externals || {})],
 
   stats: 'errors-only',
@@ -18,6 +18,10 @@ export default {
         exclude: /node_modules/,
         use: {
           loader: 'ts-loader',
+          options: {
+            // Remove this line to enable type checking in webpack builds
+            transpileOnly: true,
+          },
         },
       },
     ],
@@ -42,12 +46,10 @@ export default {
   plugins: [
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
-    }),
-    new webpack.DefinePlugin({
-      'process.env': JSON.stringify({
-        API_URL: 'http://localhost:3001/',
-        API_KEY: 'c8ff19c5ecedeeca1207ef8e364448e6',
-      }),
+      API_URL: 'http://localhost:3001/',
+      API_KEY: 'c8ff19c5ecedeeca1207ef8e364448e6',
     }),
   ],
 };
+
+export default configuration;

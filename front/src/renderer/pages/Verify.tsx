@@ -5,10 +5,9 @@ import {
   FaTimes,
   FaSync,
   FaCheckDouble,
-  FaChevronLeft,
-  FaChevronRight,
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import Pagination from '../components/Pagination';
 import NavBar from '../components/NavBar';
 import api from '../utils/api';
 
@@ -147,46 +146,11 @@ const Verify = () => {
                   </select>
                 </label>
                 <div className="flex items-center justify-center mb-4">
-                  <button
-                    className="text-blue-500 bg-transparent border-l border-t border-b border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded-l outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
-                    type="button"
-                    disabled={currentPage === 1}
-                    onClick={() => {
-                      if (currentPage !== 1) setCurrentPage(currentPage - 1);
-                    }}
-                  >
-                    <FaChevronLeft />
-                  </button>
-                  <button
-                    className="text-blue-500 bg-transparent border border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
-                    type="button"
-                  >
-                    {currentPage}
-                  </button>
-                  <button
-                    disabled
-                    className="text-blue-500 bg-transparent border border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
-                    type="button"
-                  >
-                    ...
-                  </button>
-                  <button
-                    disabled
-                    className="text-blue-500 bg-transparent border border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
-                    type="button"
-                  >
-                    {`${lastPage}`}
-                  </button>
-                  <button
-                    className="text-blue-500 bg-transparent border-r border-t border-b border-blue-500 hover:bg-blue-500 hover:text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded-r outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
-                    type="button"
-                    disabled={currentPage === lastPage}
-                    onClick={() => {
-                      setCurrentPage(currentPage + 1);
-                    }}
-                  >
-                    <FaChevronRight />
-                  </button>
+                  <Pagination
+                    currentPage={currentPage}
+                    setPage={setCurrentPage}
+                    limit={lastPage}
+                  />
                 </div>
               </div>
             </div>

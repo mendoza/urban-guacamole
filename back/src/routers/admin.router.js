@@ -4,7 +4,6 @@ const annotationRepo = require("../models/annotation.model");
 const annotationMetaRepo = require("../models/annotationMeta.model");
 const middlewares = require("../middlewares");
 const bcrypt = require("bcrypt");
-const { $where } = require("../models/user.model");
 
 const router = express.Router();
 const saltRounds = Number(process.env.SALT_ROUNDS);
@@ -32,6 +31,31 @@ router.post("/users", async (req, res, next) => {
     res.json({ success: true, user: doc.toJSON() });
   } catch (error) {
     next(err);
+  }
+});
+
+router.get("/", async (req, res, next) => {
+  try {
+    const found = await annotationMetaRepo.aggregate([
+      {
+        $match: {
+          done: { $eq: true },
+        },
+      },
+      {
+        $lookup: {
+          from: "annotations",
+          localField: "annotationId",
+          foreignField: "_id",
+          as: "annotation",
+        },
+      },
+    ]);
+    const mapped = found.map((item) => item.annotation);
+    const data = JSON.stringify({ found: mapped });
+    res.send(data);
+  } catch (error) {
+    next(error);
   }
 });
 

@@ -41,9 +41,9 @@ const NavBar = () => {
           <ul className="flex flex-col lg:flex-row list-none ml-auto">
             {Routes.filter((item) =>
               item.roles?.includes(window.electron.store.get('role'))
-            ).map((item) => {
+            ).map((item, idx) => {
               return (
-                <li className="nav-item">
+                <li key={`nav-item-${idx}`} className="nav-item">
                   <Link
                     to={item.path}
                     className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
