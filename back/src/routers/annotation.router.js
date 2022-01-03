@@ -30,11 +30,6 @@ router.get("/", async (req, res, next) => {
         },
       },
     ]);
-    console.log(found[0]);
-    // const found = await AnnotationMetaRepo.find({
-    //   annotatedBy: user._id,
-    //   done: false,
-    // });
     res.send({ items: found, item: found[0] });
   } catch (error) {
     console.log(error);
@@ -73,11 +68,25 @@ router.post("/annotate", async (req, res, next) => {
 
 router.get("/verify", async (req, res, next) => {
   try {
-    const found = await AnnotationRepo.find({
-      annotatedBy: { $exists: true },
-      verifiedBy: { $exists: false },
-    });
-    res.send({ found });
+    const found = await AnnotationMetaRepo.aggregate([
+      {
+        $match: { done: true, verifiedBy: { $exists: false } },
+      },
+      {
+        $lookup: {
+          from: "annotations",
+          localField: "annotationId",
+          foreignField: "_id",
+          as: "annotation",
+        },
+      },
+      {
+        $set: {
+          annotation: { $first: "$annotation" },
+        },
+      },
+    ]);
+    res.send({ found: found.map((item) => item.annotation) });
   } catch (error) {
     next(error);
   }
@@ -89,16 +98,16 @@ router.post("/verify", async (req, res, next) => {
   try {
     let confirm;
     if (correct) {
-      confirm = await AnnotationRepo.updateMany(
+      confirm = await AnnotationMetaRepo.updateMany(
         { path: { $in: correct } },
         { verifiedBy: _id }
       );
     }
 
     if (wrong) {
-      confirm = await AnnotationRepo.updateMany(
+      confirm = await AnnotationMetaRepo.updateMany(
         { path: { $in: wrong } },
-        { $unset: { annotatedBy: 1 } }
+        { $set: { done: false } }
       );
     }
     res.send({ data: "pong" });

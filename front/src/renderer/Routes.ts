@@ -4,6 +4,7 @@ import AssignAnnotation from './pages/AssignAnnotation';
 import LoadPreclass from './pages/LoadPreclass';
 import Verify from './pages/Verify';
 import CreateUsers from './pages/CreateUsers';
+import DownloadData from './pages/DownloadData';
 
 const Routes = [
   {
@@ -27,6 +28,14 @@ const Routes = [
     exact: true,
     path: '/admin/create',
     name: 'Create User',
+    roles: ['admin'],
+    private: true,
+  },
+  {
+    component: DownloadData,
+    exact: true,
+    path: '/admin/download',
+    name: 'Download Annotated Data',
     roles: ['admin'],
     private: true,
   },

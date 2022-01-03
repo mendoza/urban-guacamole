@@ -50,10 +50,14 @@ router.get("/", async (req, res, next) => {
           as: "annotation",
         },
       },
+      { $unset: "annotationId" },
+      {
+        $set: {
+          annotation: { $first: "$annotation" },
+        },
+      },
     ]);
-    const mapped = found.map((item) => item.annotation);
-    const data = JSON.stringify({ found: mapped });
-    res.send(data);
+    res.send({ finished: found.map((item) => ({ ...item.annotation })) });
   } catch (error) {
     next(error);
   }

@@ -19,7 +19,7 @@ const Pagination = ({
           role="button"
           tabIndex={0}
           onClick={() => {
-            if (currentPage !== 1) setPage(currentPage - 1);
+            if (currentPage > 1) setPage(currentPage - 1);
           }}
         >
           <svg
@@ -81,7 +81,7 @@ const Pagination = ({
           role="button"
           tabIndex={0}
           onClick={() => {
-            if (currentPage !== limit) setPage(currentPage + 1);
+            if (currentPage < limit) setPage(currentPage + 1);
           }}
         >
           <svg

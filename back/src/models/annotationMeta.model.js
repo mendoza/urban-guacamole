@@ -10,6 +10,10 @@ const annotationSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       required: false,
     },
+    verifiedBy: {
+      type: mongoose.Types.ObjectId,
+      required: false,
+    },
     done: {
       type: Boolean,
       required: true,

@@ -24,7 +24,6 @@ const LoadPreclass = () => {
             </div>
           ) : (
             <div className="bg-white shadow-lg rounded-lg m-2 overflow-auto h-full w-1/2">
-              <a href="http://localhost:3001/admin/">test</a>
               <pre>{JSON.stringify(preClass, null, 4)}</pre>
             </div>
           )}
