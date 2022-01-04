@@ -22,7 +22,7 @@ router.post("/signup", async (req, res, next) => {
 router.post("/login", async (req, res, next) => {
   const { email, password } = req.body;
   const doc = await user.findOne({ email });
-  if (bcrypt.compareSync(password, doc.password)) {
+  if (doc !== null && bcrypt.compareSync(password, doc.password)) {
     jwt.sign({ email, role: doc.role }, secret, (err, hash) => {
       if (err) next(err);
       res.json({
