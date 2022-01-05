@@ -30,6 +30,7 @@ const Settings = () => {
                   window.electron.store.set('endpoint', endpoint);
                   toast.success('Successfully updated, the API endpoint');
                 }
+                toast.success('Please relaunch the app!');
               }}
             >
               <div className="grid grid-cols-2 gap-4">
