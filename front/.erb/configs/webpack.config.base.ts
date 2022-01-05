@@ -46,8 +46,6 @@ const configuration: webpack.Configuration = {
   plugins: [
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
-      API_URL: 'http://localhost:3001/',
-      API_KEY: 'c8ff19c5ecedeeca1207ef8e364448e6',
     }),
   ],
 };

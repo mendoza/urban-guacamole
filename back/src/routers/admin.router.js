@@ -81,10 +81,11 @@ router.get("/available", async (req, res, next) => {
           },
         },
       },
+      { $group: { _id: null, myCount: { $sum: 1 } } },
+      { $project: { _id: 0 } },
     ]);
-    res.send({ available: found.length });
+    res.send({ available: found[0].myCount });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 });

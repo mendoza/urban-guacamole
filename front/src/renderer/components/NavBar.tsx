@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { useState } from 'react';
-import { useHistory } from 'react-router';
+import { useHistory, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Routes from '../Routes';
@@ -10,7 +10,7 @@ import Routes from '../Routes';
 const NavBar = () => {
   const [hidden, setHidden] = useState(true);
   const history = useHistory();
-
+  const location = useLocation();
   return (
     <nav className="relative flex flex-wrap items-center justify-between px-2 py-3 bg-blue-600 mb-3">
       <div className="container px-4 mx-auto flex flex-wrap items-center justify-between">
@@ -56,14 +56,16 @@ const NavBar = () => {
             <li className="nav-item">
               <div
                 onClick={() => {
-                  window.electron.store.delete('token');
-                  window.electron.store.delete('role');
-                  toast.success('Logged out successfully');
+                  if (location.comesFromLogin === undefined) {
+                    window.electron.store.delete('token');
+                    window.electron.store.delete('role');
+                    toast.success('Logged out successfully');
+                  }
                   history.push('/');
                 }}
                 className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
               >
-                Log out
+                {location.comesFromLogin === undefined ? 'Log out' : 'Go Back'}
               </div>
             </li>
           </ul>

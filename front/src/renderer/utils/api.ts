@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: process.env.API_URL,
+  baseURL: window.electron.store.get('endpoint'),
   timeout: 120_000,
 });
 

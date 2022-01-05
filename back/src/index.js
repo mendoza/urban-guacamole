@@ -52,6 +52,11 @@ app.use("/annotation", require("./routers/annotation.router"));
 app.use("/admin", require("./routers/admin.router"));
 
 app.use("/img", express.static("./images"));
+
+app.use("/ping", (req, res) => {
+  res.send({ message: "pong" });
+});
+
 app.use(middlewares.defaultError);
 app.use(middlewares.NotFound);
 

@@ -5,6 +5,7 @@ import LoadPreclass from './pages/LoadPreclass';
 import Verify from './pages/Verify';
 import CreateUsers from './pages/CreateUsers';
 import DownloadData from './pages/DownloadData';
+import Settings from './pages/Settings';
 
 const Routes = [
   {
@@ -54,6 +55,14 @@ const Routes = [
     name: 'Home',
     roles: ['annotator'],
     private: true,
+  },
+  {
+    component: Settings,
+    exact: true,
+    path: '/settings',
+    name: 'User Settings',
+    roles: ['admin', 'annotator', 'verifier'],
+    private: false,
   },
   { component: Login, private: false, path: '/', exact: true },
 ];

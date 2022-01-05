@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useHistory, Redirect } from 'react-router-dom';
+import { useHistory, Redirect, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import api from '../utils/api';
 
@@ -28,7 +28,6 @@ const Login = () => {
               });
               window.electron.store.set('token', data.token);
               window.electron.store.set('role', data.role);
-              console.log(data.role);
               history.push(`/${data.role}`);
             } catch ({ response }) {
               toast.error('Error on authentication');
@@ -67,13 +66,19 @@ const Login = () => {
                 />
               </label>
             </div>
-            <div className="flex items-baseline justify-around">
+            <div className="flex flex-col items-center justify-center">
               <button
                 type="submit"
                 className="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900"
               >
                 Login
               </button>
+              <Link
+                to={{ pathname: '/settings', comesFromLogin: true }}
+                className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+              >
+                Settings
+              </Link>
             </div>
           </div>
         </form>

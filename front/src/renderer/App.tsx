@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { MemoryRouter as Router, Switch, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'tailwindcss/components.css';
@@ -8,6 +9,15 @@ import PrivateRoute from './components/PrivateRoute';
 import Routes from './Routes';
 
 const App = () => {
+  useEffect(() => {
+    const hasUsedTheApp = window.electron.store.get('hasUsedTheApp');
+    console.log(hasUsedTheApp);
+    if (hasUsedTheApp === undefined) {
+      window.electron.store.set('hasUsedTheApp', true);
+      window.electron.store.set('endpoint', 'http://localhost:3001/');
+    }
+  }, []);
+
   return (
     <>
       <ToastContainer
