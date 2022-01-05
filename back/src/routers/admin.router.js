@@ -63,6 +63,32 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.get("/available", async (req, res, next) => {
+  try {
+    const found = await annotationRepo.aggregate([
+      {
+        $lookup: {
+          from: "annotationMeta",
+          localField: "_id",
+          foreignField: "annotationId",
+          as: "trans",
+        },
+      },
+      {
+        $match: {
+          "trans.annotationId": {
+            $exists: false,
+          },
+        },
+      },
+    ]);
+    res.send({ available: found.length });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
 router.post("/assign", async (req, res, next) => {
   const { difficulty, limit, who } = req.body;
   try {
