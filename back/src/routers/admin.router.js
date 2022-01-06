@@ -65,10 +65,10 @@ router.get("/", async (req, res, next) => {
 
 router.get("/available", async (req, res, next) => {
   try {
-    const found = await annotationRepo.aggregate([
+    const foundAnnotation = await annotationRepo.aggregate([
       {
         $lookup: {
-          from: "annotationMeta",
+          from: "annotationmetas",
           localField: "_id",
           foreignField: "annotationId",
           as: "trans",
@@ -76,15 +76,14 @@ router.get("/available", async (req, res, next) => {
       },
       {
         $match: {
-          "trans.annotationId": {
-            $exists: false,
-          },
+          trans: { $eq: [] },
         },
       },
-      { $group: { _id: null, myCount: { $sum: 1 } } },
+      { $group: { _id: null, totalAnnotation: { $sum: 1 } } },
       { $project: { _id: 0 } },
     ]);
-    res.send({ available: found[0].myCount });
+
+    res.send({ available: foundAnnotation[0].totalAnnotation });
   } catch (error) {
     next(error);
   }
@@ -96,7 +95,7 @@ router.post("/assign", async (req, res, next) => {
     const found = await annotationRepo.aggregate([
       {
         $lookup: {
-          from: "annotationMeta",
+          from: "annotationmetas",
           localField: "_id",
           foreignField: "annotationId",
           as: "trans",
@@ -104,9 +103,7 @@ router.post("/assign", async (req, res, next) => {
       },
       {
         $match: {
-          "trans.annotationId": {
-            $exists: false,
-          },
+          trans: { $eq: [] },
         },
       },
       {

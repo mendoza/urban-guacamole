@@ -191,7 +191,9 @@ const Verify = () => {
                     <img
                       alt={item.path}
                       className="object-contain h-auto xl:w-5/6 w-full"
-                      src={`${process.env.API_URL}img/${item.path}`}
+                      src={`${window.electron.store.get('endpoint')}img/${
+                        item.path
+                      }`}
                     />
                     <div className="flex flex-col capitalize mt-2">
                       <p>

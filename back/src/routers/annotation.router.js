@@ -53,10 +53,11 @@ router.post("/annotate", async (req, res, next) => {
         { path: body.path },
         { $set: { ...update } }
       );
-      await AnnotationMetaRepo.updateOne(
+      const changed = await AnnotationMetaRepo.updateOne(
         { annotationId: item._id },
-        { $set: { done: true } }
+        { $set: { done: true, annotatedBy: _id } }
       );
+      console.log(changed);
       res.send(confirm);
     } else {
       res.status(400).send({ message: "Path not found" });

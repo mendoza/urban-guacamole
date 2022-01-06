@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import Pagination from '../components/Pagination';
+import { FaSadTear } from 'react-icons/fa';
 
+import Pagination from '../components/Pagination';
 import NavBar from '../components/NavBar';
 import api from '../utils/api';
-import { FaSadTear } from 'react-icons/fa';
 
 const chartType = [
   'Unknown',
@@ -99,7 +99,9 @@ const Annotate = () => {
                 <img
                   loading="lazy"
                   className="object-contain h-auto xl:w-5/6 w-full"
-                  src={`${process.env.API_URL}img/${currentImage?.annotation?.path}`}
+                  src={`${window.electron.store.get('endpoint')}img/${
+                    currentImage?.annotation?.path
+                  }`}
                   alt={currentImage?.annotation?.path}
                 />
               </div>

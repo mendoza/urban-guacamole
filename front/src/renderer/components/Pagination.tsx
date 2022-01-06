@@ -38,7 +38,14 @@ const Pagination = ({
           </svg>
         </div>
         <div className="flex h-8 font-medium rounded-full bg-gray-200">
-          <div className="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in rounded-full  ">
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => {
+              setPage(1);
+            }}
+            className="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in rounded-full  "
+          >
             1
           </div>
           <div
