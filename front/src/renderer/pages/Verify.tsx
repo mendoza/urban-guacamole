@@ -10,26 +10,8 @@ import { toast } from 'react-toastify';
 import Pagination from '../components/Pagination';
 import NavBar from '../components/NavBar';
 import api from '../utils/api';
+import { chartType } from '../utils/Constants';
 
-const chartType = [
-  'Unknown',
-  'Bar (Horizontal)',
-  'Bar (Vertical)',
-  'Box (Horizontal)',
-  'Box (Vertical)',
-  'Pie',
-  'Line',
-  'Scatter',
-  'Scatter With Line',
-  'Area',
-  'Heatmap',
-  'Interval (Horizontal)',
-  'Interval (Vertical)',
-  'Manhattan',
-  'Map',
-  'Surface',
-  'Venn',
-];
 const pageSize = 8;
 
 const Verify = () => {
@@ -91,8 +73,8 @@ const Verify = () => {
           style={{ height: '80vh' }}
           className="flex w-full justify-center items-center"
         >
-          <div className="bg-white shadow-lg rounded-lg my-2 mx-8 p-4 overflow-auto h-full w-3/4">
-            <div className="flex flex-row justify-between p-4 w-full mb-4 bg-white rounded-lg shadow-lg sticky top-4">
+          <div className="flex flex-col h-full w-3/4">
+            <div className="flex flex-row justify-between mx-8 p-4 bg-white rounded-lg shadow-lg sticky top-4">
               <div className="flex flex-row w-full justify-around">
                 <label htmlFor="image-type" className="block text-left">
                   <span className="text-gray-700">Type of Image?</span>
@@ -154,15 +136,27 @@ const Verify = () => {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {filteredToVerify.map((item, idx) => {
-                return (
-                  <div
-                    key={`to-verify-${idx}`}
-                    tabIndex={0}
-                    role="button"
-                    onKeyDown={(e) => {
-                      if (['Enter', ' '].includes(e.key))
+            <div className="bg-white shadow-lg rounded-lg my-2 mx-8 p-4 overflow-auto h-full">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {filteredToVerify.map((item, idx) => {
+                  return (
+                    <div
+                      key={`to-verify-${idx}`}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => {
+                        if (['Enter', ' '].includes(e.key))
+                          setFilteredToVerify(
+                            filteredToVerify.map((itemInner, index) => {
+                              if (index !== idx) return itemInner;
+                              return {
+                                ...itemInner,
+                                selected: !itemInner.selected,
+                              };
+                            })
+                          );
+                      }}
+                      onClick={() => {
                         setFilteredToVerify(
                           filteredToVerify.map((itemInner, index) => {
                             if (index !== idx) return itemInner;
@@ -172,50 +166,43 @@ const Verify = () => {
                             };
                           })
                         );
-                    }}
-                    onClick={() => {
-                      setFilteredToVerify(
-                        filteredToVerify.map((itemInner, index) => {
-                          if (index !== idx) return itemInner;
-                          return {
-                            ...itemInner,
-                            selected: !itemInner.selected,
-                          };
-                        })
-                      );
-                    }}
-                    className={`flex flex-col justify-center items-center bg-white shadow-lg rounded-lg p-2 cursor-pointer ${
-                      item.selected && 'border-2 border-blue-700'
-                    }`}
-                  >
-                    <img
-                      alt={item.path}
-                      className="object-contain h-auto xl:w-5/6 w-full"
-                      src={`${window.electron.store.get('endpoint')}img/${
-                        item.path
+                      }}
+                      className={`flex flex-col justify-center items-center bg-white shadow-lg rounded-lg p-2 cursor-pointer ${
+                        item.selected && 'border-2 border-blue-700'
                       }`}
-                    />
-                    <div className="flex flex-col capitalize mt-2">
-                      <p>
-                        Type of image: <b>{item.panels}</b>
-                      </p>
-                      <p
-                        hidden={
-                          item.panels === 'multiple' || item.panels === ''
-                        }
-                      >
-                        Contains at least one chart:{' '}
-                        <b>{item.containsChart ? 'Yes' : 'No'}</b>
-                      </p>
-                      <p hidden={!item.containsChart}>
-                        Type of chart: <b>{item.typeOfChart}</b>
-                      </p>
+                    >
+                      <img
+                        alt={item.path}
+                        className="object-contain h-auto xl:w-5/6 w-full"
+                        src={`${window.electron.store.get('endpoint')}img/${
+                          item.path
+                        }`}
+                        // eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => {
+                          console.log('wenas tardes');
+                        }}
+                      />
+                      <div className="flex flex-col capitalize mt-2">
+                        <p>
+                          Type of image: <b>{item.panels}</b>
+                        </p>
+                        <p>
+                          Contains at least one chart:{' '}
+                          <b>{item.containsChart ? 'Yes' : 'No'}</b>
+                        </p>
+                        <p hidden={!item.typeOfChart}>
+                          Type of chart: <b>{item.typeOfChart}</b>
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
+
           <div className="bg-white shadow-lg rounded-lg my-2 mx-8 p-4 self-start overflow-auto w-1/4  lg:h-1/2 h-full  flex flex-col justify-around">
             <h3 className="text-2xl font-normal leading-normal mt-0 mb-2">
               Actions

@@ -9,21 +9,6 @@ const AssignAnnotation = () => {
   const [available, setAvailable] = useState(0);
   const [amount, setAmount] = useState<number>(1);
   const [difficulty, setDifficulty] = useState('easy');
-  useEffect(() => {
-    const asyncGet = async () => {
-      try {
-        const { data } = await api.get('admin/available', {
-          headers: {
-            authorization: window.electron.store.get('token'),
-          },
-        });
-        setAvailable(data.available);
-      } catch (error) {
-        toast.error('Error getting available images!');
-      }
-    };
-    asyncGet();
-  }, []);
 
   useEffect(() => {
     const asyncGet = async () => {
@@ -43,6 +28,22 @@ const AssignAnnotation = () => {
         setAnnotators(data.users);
       } catch (error) {
         toast.error('Error getting annotators!');
+      }
+    };
+    asyncGet();
+  }, []);
+
+  useEffect(() => {
+    const asyncGet = async () => {
+      try {
+        const { data } = await api.get('admin/available', {
+          headers: {
+            authorization: window.electron.store.get('token'),
+          },
+        });
+        setAvailable(data.available);
+      } catch (error) {
+        toast.error('Error getting available images!');
       }
     };
     asyncGet();

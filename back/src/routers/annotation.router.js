@@ -46,9 +46,13 @@ router.post("/annotate", async (req, res, next) => {
       const update = {
         panels: body.panels,
         containsChart: body.containsChart,
-        typeOfChart: body.chartType,
         annotatedBy: _id,
       };
+
+      if (body.panels === "single" && body.containsChart) {
+        update.typeOfChart = body.chartType;
+      }
+
       const confirm = await AnnotationRepo.updateOne(
         { path: body.path },
         { $set: { ...update } }

@@ -5,26 +5,8 @@ import { FaSadTear } from 'react-icons/fa';
 import Pagination from '../components/Pagination';
 import NavBar from '../components/NavBar';
 import api from '../utils/api';
+import { chartType } from '../utils/Constants';
 
-const chartType = [
-  'Unknown',
-  'Bar (Horizontal)',
-  'Bar (Vertical)',
-  'Box (Horizontal)',
-  'Box (Vertical)',
-  'Pie',
-  'Line',
-  'Scatter',
-  'Scatter With Line',
-  'Area',
-  'Heatmap',
-  'Interval (Horizontal)',
-  'Interval (Vertical)',
-  'Manhattan',
-  'Map',
-  'Surface',
-  'Venn',
-];
 const pageSize = 1;
 
 const Annotate = () => {
@@ -95,7 +77,7 @@ const Annotate = () => {
           </div>
           <div className="flex w-full h-full">
             <div className="flex w-1/2 justify-center items-center mx-8">
-              <div className="flex justify-center items-center py-4 px-8 bg-white shadow-lg rounded-lg my-20 xl:h-5/6 w-full">
+              <div className="flex flex-col justify-center items-center py-4 px-8 bg-white shadow-lg rounded-lg my-20 xl:h-5/6 w-full">
                 <img
                   loading="lazy"
                   className="object-contain h-auto xl:w-5/6 w-full"
@@ -104,6 +86,9 @@ const Annotate = () => {
                   }`}
                   alt={currentImage?.annotation?.path}
                 />
+                <h2 className="mt-4 font-bold">
+                  {currentImage?.annotation?.path}
+                </h2>
               </div>
             </div>
             <div className="flex justify-center items-center w-1/2">
@@ -113,13 +98,18 @@ const Annotate = () => {
                     e.preventDefault();
                     e.persist();
                     try {
+                      const payload: any = {
+                        panels,
+                        containsChart,
+                        path: currentImage?.annotation?.path,
+                      };
+                      if (containsChart && panels === 'single') {
+                        payload.chartType = typeOfChart;
+                      }
                       await api.post(
                         '/annotation/annotate',
                         {
-                          panels,
-                          containsChart,
-                          chartType: typeOfChart,
-                          path: currentImage?.annotation?.path,
+                          ...payload,
                         },
                         {
                           headers: {
@@ -165,9 +155,8 @@ const Annotate = () => {
                       Multiple Panel
                     </label>
                   </fieldset>
-                  <div hidden={panels === 'multiple' || panels === ''}>
+                  <div>
                     <div className="mt-4" />
-
                     <h3 className="text-xl font-bold text-center">
                       Does it contains at least one chart?
                     </h3>
@@ -205,7 +194,7 @@ const Annotate = () => {
                       </label>
                     </fieldset>
 
-                    <div hidden={!containsChart}>
+                    <div hidden={panels === 'multiple' || !containsChart}>
                       <div className="mt-4" />
 
                       <h3 className="text-xl font-bold text-center">
@@ -214,7 +203,7 @@ const Annotate = () => {
                       <div className="mt-4" />
                       <div className="flex justify-around">
                         <select
-                          required={panels === 'single' && containsChart}
+                          required={panels !== 'multiple' && containsChart}
                           value={typeOfChart}
                           onChange={(e) => {
                             setTypeOfChart(e.target.value);
