@@ -13,13 +13,6 @@ const AssignAnnotation = () => {
   useEffect(() => {
     const asyncGet = async () => {
       try {
-        const { data: dataAvailable } = await api.get('admin/available', {
-          headers: {
-            authorization: window.electron.store.get('token'),
-          },
-        });
-        setAvailable(dataAvailable.available);
-
         const { data } = await api.get('admin/users', {
           headers: {
             authorization: window.electron.store.get('token'),

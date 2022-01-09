@@ -57,7 +57,12 @@ router.get("/", async (req, res, next) => {
         },
       },
     ]);
-    res.send({ finished: found.map((item) => ({ ...item.annotation })) });
+    res.send({
+      finished: found.map((item) => ({
+        ...item.annotation,
+        verified: item["verifiedBy"] ? true : false,
+      })),
+    });
   } catch (error) {
     next(error);
   }
