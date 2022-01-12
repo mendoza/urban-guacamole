@@ -5,6 +5,7 @@ const annotationSchema = new mongoose.Schema(
     annotationId: {
       type: mongoose.Types.ObjectId,
       required: false,
+      index: true,
     },
     annotatedBy: {
       type: mongoose.Types.ObjectId,
