@@ -95,8 +95,12 @@ router.get("/available", async (req, res, next) => {
 });
 
 router.post("/assign", async (req, res, next) => {
-  const { difficulty, limit, who } = req.body;
+  const { difficulty, limit, type } = req.body;
   try {
+    const match = {};
+    if (type !== undefined && type !== "any") {
+      match.preTypeOfChart = type === "Unknown" ? null : type;
+    }
     const found = await annotationRepo.aggregate([
       {
         $lookup: {
@@ -117,6 +121,9 @@ router.post("/assign", async (req, res, next) => {
         },
       },
       { $sort: { avgConfidence: difficulty === "easy" ? -1 : 1 } },
+      {
+        $match: { ...match },
+      },
       {
         $limit: limit,
       },

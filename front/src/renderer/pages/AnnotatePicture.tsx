@@ -5,7 +5,7 @@ import { FaSadTear } from 'react-icons/fa';
 import Pagination from '../components/Pagination';
 import NavBar from '../components/NavBar';
 import api from '../utils/api';
-import { chartType } from '../utils/Constants';
+import { chartTypes } from '../utils/Constants';
 
 const pageSize = 1;
 
@@ -212,7 +212,7 @@ const Annotate = () => {
                           <option disabled value={-2}>
                             Select a type of chart
                           </option>
-                          {chartType.map((item, index) => {
+                          {chartTypes.map((item, index) => {
                             return (
                               // eslint-disable-next-line react/no-array-index-key
                               <option key={`chartype-${index}`} value={item}>

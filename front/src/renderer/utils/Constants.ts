@@ -1,4 +1,4 @@
-export const chartType = [
+export const chartTypes = [
   'Unknown',
   'Horizontal Bar',
   'Vertical Bar',
@@ -18,4 +18,4 @@ export const chartType = [
   'Venn',
 ];
 
-export default { chartType };
+export default { chartTypes };

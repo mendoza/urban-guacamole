@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { chartTypes } from '../utils/Constants';
 import NavBar from '../components/NavBar';
 import api from '../utils/api';
 
@@ -9,6 +10,7 @@ const AssignAnnotation = () => {
   const [available, setAvailable] = useState(0);
   const [amount, setAmount] = useState<number>(1);
   const [difficulty, setDifficulty] = useState('easy');
+  const [type, setType] = useState('any');
 
   useEffect(() => {
     const asyncGet = async () => {
@@ -66,6 +68,7 @@ const AssignAnnotation = () => {
                       limit: amount,
                       who: selectedAnnotator,
                       difficulty,
+                      type,
                     },
                     {
                       headers: {
@@ -123,7 +126,7 @@ const AssignAnnotation = () => {
                   </select>
                 </label>
               </div>
-              <div className="col-span-2">
+              <div>
                 <label className="block" htmlFor="email">
                   How many images
                   <input
@@ -141,11 +144,35 @@ const AssignAnnotation = () => {
                   />
                 </label>
               </div>
+              <div>
+                <label className="block" htmlFor="email">
+                  Type of chart
+                  <select
+                    required
+                    value={type}
+                    onChange={(e) => {
+                      setType(e.currentTarget.value);
+                    }}
+                    id="email"
+                    placeholder="Amount of images"
+                    className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  >
+                    <option value="any">any</option>
+                    {chartTypes.map((tipo, idx) => {
+                      return (
+                        <option key={`chart-type-${idx}}`} value={tipo}>
+                          {tipo}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </label>
+              </div>
               <div className="col-span-2 flex items-baseline justify-around">
                 <button
                   type="submit"
                   className="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900"
-                  hidden={available === 0}
+                  hidden={available === 0 || selectedAnnotator === '-1'}
                 >
                   Assign annotations
                 </button>
