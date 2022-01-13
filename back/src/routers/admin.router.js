@@ -95,7 +95,7 @@ router.get("/available", async (req, res, next) => {
 });
 
 router.post("/assign", async (req, res, next) => {
-  const { difficulty, limit, type } = req.body;
+  const { difficulty, limit, who, type } = req.body;
   try {
     const match = {};
     if (type !== undefined && type !== "any") {
