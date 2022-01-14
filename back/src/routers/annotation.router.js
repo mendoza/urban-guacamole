@@ -102,23 +102,33 @@ router.post("/verify", async (req, res, next) => {
   const { _id } = req.user;
   try {
     let confirm;
-    if (correct) {
-      confirm = await AnnotationMetaRepo.updateMany(
-        { path: { $in: correct } },
-        { verifiedBy: _id }
-      );
+    if (correct && correct.length !== 0) {
+      const items = await AnnotationRepo.find({
+        path: { $in: correct },
+      });
+      if (items && items.length !== 0) {
+        const ids = items.map((item) => item._id);
+        confirm = await AnnotationMetaRepo.updateMany(
+          { annotationId: { $in: ids } },
+          { verifiedBy: _id }
+        );
+      }
     }
 
-    if (wrong) {
-      confirm = await AnnotationMetaRepo.updateMany(
-        { path: { $in: wrong } },
-        { $set: { done: false } }
-      );
+    if (wrong && wrong.length !== 0) {
+      const items = await AnnotationRepo.find({
+        path: { $in: wrong },
+      });
+      if (items && items.length !== 0) {
+        const ids = items.map((item) => item._id);
+        confirm = await AnnotationMetaRepo.updateMany(
+          { annotationId: { $in: ids } },
+          { $set: { done: false } }
+        );
+      }
     }
-    res.send({ data: "pong" });
+    res.send({ confirm });
   } catch (error) {
-    console.log(error.stack);
-
     next(error);
   }
 });
