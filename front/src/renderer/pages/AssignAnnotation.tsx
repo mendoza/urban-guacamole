@@ -77,6 +77,7 @@ const AssignAnnotation = () => {
                     }
                   );
                   toast.success('Assigned successfully to the annotator!');
+                  setAvailable((prev) => prev - amount);
                 } catch (error) {
                   toast.error('Error assigning to the annotator!');
                 }

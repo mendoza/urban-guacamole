@@ -22,6 +22,7 @@ const Verify = () => {
   const [type, setType] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
+  const [cannotUpdate, setCannotUpdate] = useState(false);
   const setSellectedToall = useCallback(
     (value) => {
       setFilteredToVerify(
@@ -48,6 +49,10 @@ const Verify = () => {
   }, []);
 
   useEffect(() => {
+    setCannotUpdate(filteredToVerify.every((img) => !img.selected));
+  }, [filteredToVerify]);
+
+  useEffect(() => {
     asyncGet();
   }, [asyncGet]);
 
@@ -59,6 +64,7 @@ const Verify = () => {
           contains === 'all' || item.containsChart === (contains === 'yes')
       )
       .filter((item) => type === 'all' || item.typeOfChart === type);
+
     setLastPage(Math.ceil(filtered.length / pageSize));
     setFilteredToVerify(
       filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -180,9 +186,6 @@ const Verify = () => {
                         // eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
                         role="button"
                         tabIndex={0}
-                        onClick={() => {
-                          console.log('wenas tardes');
-                        }}
                       />
                       <div className="flex flex-col capitalize mt-2">
                         <p>
@@ -209,12 +212,48 @@ const Verify = () => {
             </h3>
             <button
               type="button"
+              disabled={cannotUpdate}
+              onClick={async () => {
+                try {
+                  console.log(
+                    filteredToVerify
+                      .filter((item) => item.selected)
+                      .map((item) => item.path)
+                  );
+                  // await api.post(
+                  //   '/annotation/verify',
+                  //   {
+                  //     correct: filteredToVerify
+                  //       .filter((item) => item.selected)
+                  //       .map((item) => item.path),
+                  //   },
+                  //   {
+                  //     headers: {
+                  //       authorization: window.electron.store.get('token'),
+                  //     },
+                  //   }
+                  // );
+                  toast.success('Successfully verified images');
+                  asyncGet();
+                } catch (error) {
+                  toast.error('Error verifying the images');
+                }
+              }}
+              className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex justify-center items-center ${
+                cannotUpdate && 'opacity-50'
+              }`}
+            >
+              <FaCheck className="mr-2" /> Correct
+            </button>
+            <button
+              type="button"
+              disabled={cannotUpdate}
               onClick={async () => {
                 try {
                   await api.post(
                     '/annotation/verify',
                     {
-                      correct: filteredToVerify
+                      wrong: filteredToVerify
                         .filter((item) => item.selected)
                         .map((item) => item.path),
                     },
@@ -230,34 +269,9 @@ const Verify = () => {
                   toast.error('Error verifying the images');
                 }
               }}
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex justify-center items-center"
-            >
-              <FaCheck className="mr-2" /> Correct
-            </button>
-            <button
-              type="button"
-              onClick={async () => {
-                try {
-                  await api.post(
-                    '/annotation/verify',
-                    {
-                      wrong: filteredToVerify
-                        .filter((item) => !item.selected)
-                        .map((item) => item.path),
-                    },
-                    {
-                      headers: {
-                        authorization: window.electron.store.get('token'),
-                      },
-                    }
-                  );
-                  toast.success('Successfully verified images');
-                  asyncGet();
-                } catch (error) {
-                  toast.error('Error verifying the images');
-                }
-              }}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex justify-center items-center"
+              className={`bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex justify-center items-center ${
+                cannotUpdate && 'opacity-50'
+              }`}
             >
               <FaTimes className="mr-2" /> Wrong
             </button>
