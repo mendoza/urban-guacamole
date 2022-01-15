@@ -140,8 +140,8 @@ router.post("/assign", async (req, res, next) => {
         },
       };
     });
-    await annotationMetaRepo.bulkWrite(bulkWrite);
-    res.send({ found });
+    const confirm = await annotationMetaRepo.bulkWrite(bulkWrite);
+    res.send({ found, confirm });
   } catch (error) {
     console.log(error);
     next(error);

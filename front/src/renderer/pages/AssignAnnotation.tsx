@@ -62,7 +62,7 @@ const AssignAnnotation = () => {
                 e.preventDefault();
                 e.persist();
                 try {
-                  await api.post(
+                  const { data } = await api.post(
                     'admin/assign',
                     {
                       limit: amount,
@@ -76,8 +76,11 @@ const AssignAnnotation = () => {
                       },
                     }
                   );
-                  toast.success('Assigned successfully to the annotator!');
-                  setAvailable((prev) => prev - amount);
+                  const assigned = data.confirm.insertedIds.length || 0;
+                  toast.success(
+                    `Successfully assigned ${assigned} images to the annotator!`
+                  );
+                  setAvailable((prev) => prev - assigned);
                 } catch (error) {
                   toast.error('Error assigning to the annotator!');
                 }
