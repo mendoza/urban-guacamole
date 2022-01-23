@@ -95,12 +95,22 @@ router.get("/available", async (req, res, next) => {
 });
 
 router.post("/assign", async (req, res, next) => {
-  const { difficulty, limit, who, type } = req.body;
+  const { difficulty, limit, who, type, panels, contains } = req.body;
   try {
     const match = {};
     if (type !== undefined && type !== "any") {
       match.preTypeOfChart = type === "Unknown" ? null : type;
     }
+
+    if (panels !== undefined && panels !== "any") {
+      match.prePanels = panels;
+    }
+
+    if (contains !== undefined && contains !== "any") {
+      match.preContainsChart = contains === "yes";
+    }
+
+    console.log(match);
     const found = await annotationRepo.aggregate([
       {
         $lookup: {

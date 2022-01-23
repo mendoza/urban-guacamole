@@ -11,6 +11,8 @@ const AssignAnnotation = () => {
   const [amount, setAmount] = useState<number>(1);
   const [difficulty, setDifficulty] = useState('easy');
   const [type, setType] = useState('any');
+  const [panels, setPanels] = useState('any');
+  const [contains, setContains] = useState('any');
 
   useEffect(() => {
     const asyncGet = async () => {
@@ -69,6 +71,8 @@ const AssignAnnotation = () => {
                       who: selectedAnnotator,
                       difficulty,
                       type,
+                      panels,
+                      contains,
                     },
                     {
                       headers: {
@@ -76,6 +80,7 @@ const AssignAnnotation = () => {
                       },
                     }
                   );
+                  console.log(data);
                   const assigned = data.confirm.insertedIds.length || 0;
                   toast.success(
                     `Successfully assigned ${assigned} images to the annotator!`
@@ -87,7 +92,7 @@ const AssignAnnotation = () => {
               }}
             >
               <div className="">
-                <label className="block" htmlFor="email">
+                <label className="block" htmlFor="annotator">
                   Selected Annotator
                   <select
                     required
@@ -95,7 +100,7 @@ const AssignAnnotation = () => {
                     onChange={(e) => {
                       setSelectedAnnotator(e.currentTarget.value);
                     }}
-                    id="email"
+                    id="annotator"
                     placeholder="Email"
                     className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
                   >
@@ -113,7 +118,7 @@ const AssignAnnotation = () => {
                 </label>
               </div>
               <div className="">
-                <label className="block" htmlFor="email">
+                <label className="block" htmlFor="difficulty">
                   Difficulty
                   <select
                     required
@@ -121,7 +126,7 @@ const AssignAnnotation = () => {
                     onChange={(e) => {
                       setDifficulty(e.currentTarget.value);
                     }}
-                    id="email"
+                    id="difficulty"
                     placeholder="Amount of images"
                     className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
                   >
@@ -131,11 +136,11 @@ const AssignAnnotation = () => {
                 </label>
               </div>
               <div>
-                <label className="block" htmlFor="email">
+                <label className="block" htmlFor="amount">
                   How many images
                   <input
                     required
-                    type="number"
+                    type="amount"
                     min={1}
                     max={available}
                     value={amount}
@@ -149,7 +154,51 @@ const AssignAnnotation = () => {
                 </label>
               </div>
               <div>
-                <label className="block" htmlFor="email">
+                <label className="block" htmlFor="panels">
+                  Panels
+                  <select
+                    required
+                    value={panels}
+                    onChange={(e) => {
+                      setPanels(e.currentTarget.value);
+                    }}
+                    id="panels"
+                    placeholder="Amount of images"
+                    className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  >
+                    <option value="any">Any</option>
+                    <option value="single">Single</option>
+                    <option value="multiple">Multiple</option>
+                  </select>
+                </label>
+              </div>
+              <div>
+                <label className="block" htmlFor="contains">
+                  Contains chart
+                  <select
+                    required
+                    value={contains}
+                    onChange={(e) => {
+                      setContains(e.currentTarget.value);
+                    }}
+                    id="contains"
+                    placeholder="Amount of images"
+                    className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  >
+                    <option value="any">Any</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </label>
+              </div>
+              <div
+                hidden={
+                  panels === 'multiple' ||
+                  contains === 'no' ||
+                  contains === 'any'
+                }
+              >
+                <label className="block" htmlFor="type">
                   Type of chart
                   <select
                     required
@@ -157,11 +206,11 @@ const AssignAnnotation = () => {
                     onChange={(e) => {
                       setType(e.currentTarget.value);
                     }}
-                    id="email"
+                    id="type"
                     placeholder="Amount of images"
                     className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
                   >
-                    <option value="any">any</option>
+                    <option value="any">Any</option>
                     {chartTypes.map((tipo, idx) => {
                       return (
                         <option key={`chart-type-${idx}}`} value={tipo}>
