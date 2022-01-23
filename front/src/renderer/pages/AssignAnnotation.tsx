@@ -70,7 +70,12 @@ const AssignAnnotation = () => {
                       limit: amount,
                       who: selectedAnnotator,
                       difficulty,
-                      type,
+                      type:
+                        panels === 'multiple' ||
+                        contains === 'no' ||
+                        contains === 'any'
+                          ? 'any'
+                          : type,
                       panels,
                       contains,
                     },
@@ -80,7 +85,6 @@ const AssignAnnotation = () => {
                       },
                     }
                   );
-                  console.log(data);
                   const assigned = data.confirm.insertedIds.length || 0;
                   toast.success(
                     `Successfully assigned ${assigned} images to the annotator!`
