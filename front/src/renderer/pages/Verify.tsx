@@ -215,24 +215,19 @@ const Verify = () => {
               disabled={cannotUpdate}
               onClick={async () => {
                 try {
-                  console.log(
-                    filteredToVerify
-                      .filter((item) => item.selected)
-                      .map((item) => item.path)
+                  await api.post(
+                    '/annotation/verify',
+                    {
+                      correct: filteredToVerify
+                        .filter((item) => item.selected)
+                        .map((item) => item.path),
+                    },
+                    {
+                      headers: {
+                        authorization: window.electron.store.get('token'),
+                      },
+                    }
                   );
-                  // await api.post(
-                  //   '/annotation/verify',
-                  //   {
-                  //     correct: filteredToVerify
-                  //       .filter((item) => item.selected)
-                  //       .map((item) => item.path),
-                  //   },
-                  //   {
-                  //     headers: {
-                  //       authorization: window.electron.store.get('token'),
-                  //     },
-                  //   }
-                  // );
                   toast.success('Successfully verified images');
                   asyncGet();
                 } catch (error) {
