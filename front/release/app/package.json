@@ -1,8 +1,8 @@
 {
   "name": "electron-react-boilerplate",
   "productName": "Chart Annotation",
-  "description": "Small chart Annotation app for ICPR 2022",
-  "version": "0.0.7",
+  "description": "Chart Annotation app for ICPR 2022",
+  "version": "0.0.8",
   "main": "./dist/main/main.js",
   "author": {
     "name": "David Mendoza",
