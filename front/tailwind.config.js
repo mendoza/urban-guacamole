@@ -1,7 +1,7 @@
 import colors from 'tailwindcss/colors';
 
 module.exports = {
-  purge: [],
+  purge: ['./src/renderer/**/*.ts', './src/renderer/**/*.tsx'],
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
